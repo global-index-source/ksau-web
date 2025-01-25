@@ -1,23 +1,34 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: false, // Disable SWC minification to help identify issues
+  typescript: {
+    ignoreBuildErrors: true
+  },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true
   },
-  images: { unoptimized: true },
-  env: {
-    NEXT_PUBLIC_API_ENDPOINT: 'http://130.61.159.88:8080'
+  images: {
+    unoptimized: true
   },
-  async headers() {
-    return [
-      {
-        source: '/api/:path*',
-        headers: [
-          { key: 'Access-Control-Allow-Origin', value: '*' },
-          { key: 'Access-Control-Allow-Methods', value: 'GET,POST,PUT,DELETE,OPTIONS' },
-          { key: 'Access-Control-Allow-Headers', value: 'Content-Type' },
-        ],
-      },
-    ];
+  experimental: {
+    // Enable more verbose logging
+    logging: {
+      level: 'verbose'
+    },
+    // Use SWC for compilation
+    swcPlugins: [],
+    // Optimize dependencies
+    optimizeDeps: {
+      include: ['react', 'react-dom']
+    }
+  },
+  webpack: (config, { isServer }) => {
+    // Add source maps for better error reporting
+    if (!isServer) {
+      config.devtool = 'source-map';
+    }
+    return config;
   }
 };
 

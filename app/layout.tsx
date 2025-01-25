@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   keywords: ["cloud storage", "file upload", "onedrive", "free storage", "ksau web"],
   authors: [{ name: "Ksauraj" }],
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300ff00' stroke-width='2'><path d='M22 12h-4l-3 9L9 3l-3 9H2'/></svg>"
+    icon: "/favicon.svg"
   }
 };
 
