@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { config } from "./config";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -27,9 +28,13 @@ export default function Home() {
   const updateCliCommand = useCallback(() => {
     if (!selectedFile) return;
     
-    const command = `ksau-go upload -f "${selectedFile.name}" -r "${formValues.remoteFolder || '/'}" ${
-      formValues.remoteFileName ? `-n "${formValues.remoteFileName}"` : ""
-    } -s ${parseInt(formValues.chunkSize) * 1024 * 1024} --remote-config ${formValues.remote}`;
+    let command = `ksau-go upload -f "${selectedFile.name}"`;
+    command += ` -r "${formValues.remoteFolder || '/'}"`;
+    if (formValues.remoteFileName) {
+      command += ` -n "${formValues.remoteFileName}"`;
+    }
+    command += ` -s ${parseInt(formValues.chunkSize) * 1024 * 1024}`;
+    command += ` --remote-config ${formValues.remote}`;
     
     setCliCommand(command.trim());
   }, [selectedFile, formValues]);
@@ -78,7 +83,7 @@ export default function Home() {
         });
       }, 500);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_ENDPOINT}/upload`, {
+      const response = await fetch(`${config.apiEndpoint}/upload`, {
         method: "POST",
         body: formData,
       });
@@ -98,9 +103,25 @@ export default function Home() {
       }
     } catch (error) {
       setUploadProgress(0);
+      console.error('Upload error:', error);
+      
+      let errorMessage = "Upload failed";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (!navigator.onLine) {
+        errorMessage = "No internet connection";
+      } else {
+        try {
+          const errorResponse = await (error as Response).json();
+          errorMessage = errorResponse.message || errorMessage;
+        } catch {
+          // Keep default error message if json parsing fails
+        }
+      }
+
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Upload failed",
+        title: "Upload Error",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
