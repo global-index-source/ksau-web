@@ -12,7 +12,7 @@ const nextConfig = {
     unoptimized: true
   },
   env: {
-    NEXT_PUBLIC_API_ENDPOINT: 'http://130.61.159.88:8080'
+    NEXT_PUBLIC_API_ENDPOINT: 'https://project.ksauraj.eu.org'
   },
   async headers() {
     return [
