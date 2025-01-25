@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: false, // Disable SWC minification to help identify issues
+  swcMinify: false,
   typescript: {
     ignoreBuildErrors: true
   },
@@ -11,24 +11,29 @@ const nextConfig = {
   images: {
     unoptimized: true
   },
-  experimental: {
-    // Enable more verbose logging
-    logging: {
-      level: 'verbose'
-    },
-    // Use SWC for compilation
-    swcPlugins: [],
-    // Optimize dependencies
-    optimizeDeps: {
-      include: ['react', 'react-dom']
-    }
+  env: {
+    NEXT_PUBLIC_API_ENDPOINT: 'http://130.61.159.88:8080'
   },
-  webpack: (config, { isServer }) => {
-    // Add source maps for better error reporting
-    if (!isServer) {
-      config.devtool = 'source-map';
-    }
-    return config;
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, PUT, DELETE, OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type',
+          },
+        ],
+      },
+    ]
   }
 };
 
