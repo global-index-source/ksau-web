@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { Upload, Share2, Copy, ExternalLink, Github, Twitter, Terminal, FileUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useDropzone } from "react-dropzone";
+import { SystemInfo } from "./components/system-info";
 
 export default function Home() {
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -198,27 +199,7 @@ export default function Home() {
                     {"{>}"} Built by developers, for developers.
                   </p>
                 </div>
-                {selectedFile && (
-                  <div className="pt-4 border-t border-green-900">
-                    <div className="space-y-2">
-                      <p className="text-sm text-green-400">{"{>}"} Equivalent CLI Command:</p>
-                      <div className="flex justify-between items-start gap-2">
-                        <code className="text-xs text-green-300 font-mono block overflow-x-auto whitespace-pre">
-                          {cliCommand}
-                        </code>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={copyCliCommand}
-                          className="hover:bg-green-950 h-6 w-6 flex-shrink-0"
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                <SystemInfo />
                 <div className="pt-4 border-t border-green-900">
                   <p className="text-xs text-green-700">
                     {"{>}"} This project is open-source! Join us in making file sharing easier for developers.
@@ -436,12 +417,33 @@ export default function Home() {
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm text-green-400 font-medium">{"{>}"} Storage Policy:</p>
-                  <ul className="text-sm text-green-300 space-y-1">
+                  <ul className="text-sm text-green-300 space-y-1 list-disc pl-4">
                     <li>Files removed at 90% storage capacity</li>
                     <li>Contact maintainers for file deletion</li>
                     <li>Best-effort storage duration</li>
                   </ul>
                 </div>
+                {selectedFile && (
+                  <div className="pt-4 border-t border-green-900">
+                    <div className="space-y-2">
+                      <p className="text-sm text-green-400">{"{>}"} Equivalent CLI Command:</p>
+                      <div className="flex justify-between items-start gap-2">
+                        <code className="text-xs text-green-300 font-mono block overflow-x-auto whitespace-pre">
+                          {cliCommand}
+                        </code>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={copyCliCommand}
+                          className="hover:bg-green-950 h-6 w-6 flex-shrink-0"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
