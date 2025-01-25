@@ -1,4 +1,4 @@
 // Configuration with fallback values
 export const config = {
-  apiEndpoint: 'http://130.61.159.88:8080',
+  apiEndpoint: 'https://project.ksauraj.eu.org',
 };
