@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+ 
+@layer base {
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 142 72% 29%;
+    --card: 0 0% 3%;
+    --card-foreground: 142 72% 29%;
+    --popover: 0 0% 3%;
+    --popover-foreground: 142 72% 29%;
+    --primary: 142 72% 29%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 142 72% 12%;
+    --secondary-foreground: 142 72% 29%;
+    --muted: 142 72% 12%;
+    --muted-foreground: 142 72% 29%;
+    --accent: 142 72% 12%;
+    --accent-foreground: 142 72% 29%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 142 72% 29%;
+    --border: 142 72% 12%;
+    --input: 142 72% 12%;
+    --ring: 142 72% 29%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-mono;
+  }
+}
+
+@keyframes cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes matrixRain {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.matrix-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.matrix-rain {
+  position: absolute;
+  color: #00ff00;
+  font-size: 1.2rem;
+  transform: translateY(-100%);
+  animation: matrixRain 5s linear infinite;
+  white-space: nowrap;
+}
+
+.terminal-cursor::after {
+  content: "_";
+  animation: cursor 1s infinite;
+}
+
+.terminal-text {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 3.5s steps(40, end);
+}
+
+.drop-zone {
+  border: 2px dashed rgba(0, 255, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.drop-zone.active {
+  border-color: #00ff00;
+  background: rgba(0, 255, 0, 0.1);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00ff00;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00cc00;
+}
