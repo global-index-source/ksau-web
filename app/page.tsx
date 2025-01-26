@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Upload, Share2, Copy, ExternalLink, Github, Twitter, Terminal, FileUp } from "lucide-react";
+import { AnimatedText } from "./components/animated-text";
 import { useToast } from "@/hooks/use-toast";
 import { useDropzone } from "react-dropzone";
 import { SystemInfo } from "./components/system-info";
@@ -389,29 +390,34 @@ export default function Home() {
 
                 {downloadUrl && (
                   <div className="mt-6 space-y-2">
-                    <div className="flex items-center gap-2 p-3 rounded-lg border border-green-900 bg-black/50">
-                      <Share2 className="h-4 w-4 text-green-700" />
-                      <p className="text-sm flex-1 truncate">
-                        {downloadUrl}
-                      </p>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={copyUrl}
-                        className="hover:bg-green-950"
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={openUrl}
-                        className="hover:bg-green-950"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
+                    <div className="download-box">
+                      <div className="download-box-content flex items-center gap-2">
+                        <Share2 className="h-4 w-4 text-green-700 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <AnimatedText
+                            text={downloadUrl}
+                            className="text-sm text-green-300 pb-1"
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={copyUrl}
+                          className="hover:bg-green-950 flex-shrink-0"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={openUrl}
+                          className="hover:bg-green-950 flex-shrink-0"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 )}
