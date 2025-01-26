@@ -11,9 +11,6 @@ const nextConfig = {
   images: {
     unoptimized: true
   },
-  env: {
-    NEXT_PUBLIC_API_ENDPOINT: 'https://project.ksauraj.eu.org'
-  },
   async rewrites() {
     return [
       {

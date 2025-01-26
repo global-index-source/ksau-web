@@ -11,6 +11,7 @@ import { Upload, Share2, Copy, ExternalLink, Github, Twitter, Terminal, FileUp }
 import { useToast } from "@/hooks/use-toast";
 import { useDropzone } from "react-dropzone";
 import { SystemInfo } from "./components/system-info";
+import { StorageQuota } from "./components/storage-quota";
 
 export default function Home() {
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -84,7 +85,7 @@ export default function Home() {
         });
       }, 500);
 
-      const response = await fetch(`${config.apiEndpoint}/upload`, {
+      const response = await fetch(`${config.apiEndpoint}${config.endpoints.upload}`, {
         method: "POST",
         body: formData,
       });
@@ -201,7 +202,24 @@ export default function Home() {
                 </div>
                 <SystemInfo />
                 <div className="pt-4 border-t border-green-900">
-                  <p className="text-xs text-green-700">
+                  <div className="space-y-2">
+                    <p className="text-sm text-green-400">{"{>}"} CLI Command:</p>
+                    <div className="flex justify-between items-start gap-2">
+                      <code className="text-xs text-green-300 font-mono block overflow-x-auto whitespace-pre">
+                        {cliCommand}
+                      </code>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={copyCliCommand}
+                        className="hover:bg-green-950 h-6 w-6 flex-shrink-0"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-green-700 mt-4">
                     {"{>}"} This project is open-source! Join us in making file sharing easier for developers.
                   </p>
                   <a
@@ -411,7 +429,6 @@ export default function Home() {
                   <p className="text-sm text-green-400 font-medium">{"{>}"} Acceptable Files:</p>
                   <ul className="text-sm text-green-300 space-y-1 list-disc pl-4">
                     <li>Development builds and test files</li>
-                    <li>Documentation and technical resources</li>
                     <li>Project assets for testing</li>
                   </ul>
                 </div>
@@ -420,30 +437,11 @@ export default function Home() {
                   <ul className="text-sm text-green-300 space-y-1 list-disc pl-4">
                     <li>Files removed at 90% storage capacity</li>
                     <li>Contact maintainers for file deletion</li>
-                    <li>Best-effort storage duration</li>
                   </ul>
                 </div>
-                {selectedFile && (
-                  <div className="pt-4 border-t border-green-900">
-                    <div className="space-y-2">
-                      <p className="text-sm text-green-400">{"{>}"} Equivalent CLI Command:</p>
-                      <div className="flex justify-between items-start gap-2">
-                        <code className="text-xs text-green-300 font-mono block overflow-x-auto whitespace-pre">
-                          {cliCommand}
-                        </code>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={copyCliCommand}
-                          className="hover:bg-green-950 h-6 w-6 flex-shrink-0"
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                <div className="pt-4 border-t border-green-900">
+                  <StorageQuota />
+                </div>
               </CardContent>
             </Card>
           </div>
