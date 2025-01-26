@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { config } from '../config';
 
 interface SystemData {
   cpu: {
@@ -23,7 +24,7 @@ export function SystemInfo() {
     const fetchSystemInfo = async () => {
       try {
         setError(null);
-        const response = await fetch('/api/system');
+        const response = await fetch(`${config.apiEndpoint}${config.endpoints.system}`);
         const data = await response.json();
         if (data.status === 'success') {
           setSystemData(data.data);
