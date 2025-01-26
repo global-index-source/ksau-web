@@ -397,6 +397,10 @@ export default function Home() {
                           <AnimatedText
                             text={downloadUrl}
                             className="text-sm text-green-300 pb-1"
+                            config={{
+                              charDelay: 40,
+                              animDuration: 300
+                            }}
                           />
                         </div>
                         <Button
