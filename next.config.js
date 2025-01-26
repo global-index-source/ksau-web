@@ -17,6 +17,10 @@ const nextConfig = {
         source: '/api/system',
         destination: 'https://project.ksauraj.eu.org/system',
       },
+      {
+        source: '/api/quota',
+        destination: 'https://project.ksauraj.eu.org/quota',
+      },
     ]
   }
 };

@@ -24,7 +24,7 @@ export function StorageQuota() {
   useEffect(() => {
     const fetchQuota = async () => {
       try {
-        const response = await fetch(`${config.apiEndpoint}${config.endpoints.quota}`);
+        const response = await fetch('/api/quota');
         const data = await response.json();
         if (data.status === "success") {
           setQuotaData(data.data);
