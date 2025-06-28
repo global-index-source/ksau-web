@@ -113,6 +113,58 @@ ksau-web/
 
 This web interface works alongside the [ksau-go CLI tool](https://github.com/global-index-source/ksau-go). The interface shows equivalent CLI commands for each operation, making it easy to switch between web and CLI usage.
 
+## Docker Usage
+
+This project can be run using Docker and Docker Compose.
+
+### Prerequisites
+
+- Docker
+- Docker Compose
+
+### Building and Running with Docker Compose
+
+1.  Ensure Docker is running on your system.
+2.  Navigate to the root of the project directory.
+3.  To build and run the application:
+    ```bash
+    docker-compose up --build
+    ```
+    This will build the Docker image and start the Next.js application, accessible at `http://localhost:3000`.
+
+### Configuring API Endpoints with Docker Compose
+
+You can configure the API endpoints by uncommenting and setting the `environment` variables in `docker-compose.yml`:
+
+-   `NEXT_PUBLIC_LOCAL_API_ENDPOINT`: Use this for a local backend (e.g., `http://localhost:8080`). This takes precedence over `NEXT_PUBLIC_API_ENDPOINT` and `NEXT_PUBLIC_API_BASE_URL`.
+-   `NEXT_PUBLIC_API_ENDPOINT`: Use this for a remote backend (e.g., `https://project.ksauraj.eu.org`). This is a fallback if `NEXT_PUBLIC_LOCAL_API_ENDPOINT` is not set.
+-   `NEXT_PUBLIC_API_BASE_URL`: This environment variable is used for Next.js rewrites to proxy API calls. It should point to the base URL of your API backend (e.g., `https://project.ksauraj.eu.org` or `http://localhost:8080`).
+
+Example `docker-compose.yml` for local backend:
+
+```yaml
+services:
+  nextjs-app:
+    environment:
+      NEXT_PUBLIC_LOCAL_API_ENDPOINT: "http://localhost:8080"
+      NODE_ENV: production
+```
+
+Example `docker-compose.yml` for remote backend:
+
+```yaml
+services:
+  nextjs-app:
+    environment:
+      NEXT_PUBLIC_API_ENDPOINT: "https://project.ksauraj.eu.org"
+      NODE_ENV: production
+```
+
+To stop the Docker containers:
+```bash
+docker-compose down
+```
+
 ## Contributing
 
 1. Fork the repository

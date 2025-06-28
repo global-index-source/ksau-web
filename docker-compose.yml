@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  nextjs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:  
+        # NEXT_PUBLIC_LOCAL_API_ENDPOINT: "http://host.docker.internal:8080"  # For Mac/Windows
+        # NEXT_PUBLIC_LOCAL_API_ENDPOINT: "http://172.17.0.1:8080"  # For Linux
+        NEXT_PUBLIC_LOCAL_API_ENDPOINT: ''
+        NEXT_PUBLIC_API_BASE_URL: ''
+    ports:
+      - "3000:3000"
+    environment:
+      # Set NEXT_PUBLIC_LOCAL_API_ENDPOINT for local backend (highest priority)
+      # NEXT_PUBLIC_LOCAL_API_ENDPOINT: "http://172.17.0.1:8080"
+      # Set NEXT_PUBLIC_API_ENDPOINT for remote backend (fallback)
+      # NEXT_PUBLIC_API_ENDPOINT: "https://project.ksauraj.eu.org"
+      # NEXT_PUBLIC_API_BASE_URL: "https://project.ksauraj.eu.org"
+      NEXT_PUBLIC_LOCAL_API_ENDPOINT: ''
+      NEXT_PUBLIC_API_BASE_URL: ''
+      NODE_ENV: production

@@ -1,4 +1,9 @@
 /** @type {import('next').NextConfig} */
+const API_BASE =
+  process.env.NEXT_PUBLIC_LOCAL_API_ENDPOINT ||
+  process.env.NEXT_PUBLIC_API_ENDPOINT ||
+  'https://project.ksauraj.eu.org';
+
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: false,
@@ -15,11 +20,11 @@ const nextConfig = {
     return [
       {
         source: '/api/system',
-        destination: 'https://project.ksauraj.eu.org/system',
+        destination: `${API_BASE}/system`,
       },
       {
         source: '/api/quota',
-        destination: 'https://project.ksauraj.eu.org/quota',
+        destination: `${API_BASE}/quota`,
       },
     ]
   }
