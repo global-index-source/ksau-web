@@ -2,17 +2,19 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { config } from "./config";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Upload, Share2, Copy, ExternalLink, Github, Twitter, Terminal, FileUp } from "lucide-react";
+import { Upload, Share2, Copy, ExternalLink, Github, Twitter, CloudUpload, CheckCircle2, Settings, Activity, Database, ChevronDown } from "lucide-react";
 import { AnimatedText } from "./components/animated-text";
 import { useToast } from "@/hooks/use-toast";
 import { useDropzone } from "react-dropzone";
-import { SystemInfo } from "./components/system-info";
-import { StorageQuota } from "./components/storage-quota";
+import { Header } from "./components/header";
+import { SystemModal } from "./components/system-modal";
+import { StorageModal } from "./components/storage-modal";
+import { SettingsModal } from "./components/settings-modal";
 
 export default function Home() {
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -20,6 +22,10 @@ export default function Home() {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [cliCommand, setCliCommand] = useState("");
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [systemModalOpen, setSystemModalOpen] = useState(false);
+  const [storageModalOpen, setStorageModalOpen] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [formValues, setFormValues] = useState({
     remote: "oned",
     remoteFolder: "/",
@@ -154,316 +160,310 @@ export default function Home() {
     });
   };
 
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   return (
-    <main className="min-h-screen bg-black text-green-500 py-8 px-4 relative overflow-hidden">
-      <div className="matrix-background">
-        {Array.from({ length: 50 }).map((_, i) => (
-          <div
-            key={i}
-            className="matrix-rain"
-            style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-            }}
-          >
-            {"{>}"} $ 
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      <main className="container mx-auto px-6 py-12 max-w-2xl">
+        {/* Hero Section */}
+        <section className="text-center space-y-8 mb-16 fade-in">
+          <div className="space-y-6">
+            <div className="flex items-center justify-center">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 blur-3xl rounded-full"></div>
+                <CloudUpload className="relative h-16 w-16 text-primary" />
+              </div>
+            </div>
+            <div className="space-y-3">
+              <h1 className="text-5xl font-light tracking-tight">Ksau</h1>
+              <p className="text-lg text-muted-foreground max-w-md mx-auto leading-relaxed">
+                Simple, fast file sharing for developers
+              </p>
+            </div>
           </div>
-        ))}
-      </div>
+        </section>
 
-      <div className="container mx-auto space-y-8 relative z-10">
-        <div className="text-center space-y-4 mb-12">
-          <div className="flex items-center justify-center space-x-3">
-            <Terminal className="h-10 w-10" />
-            <h1 className="text-5xl font-bold terminal-cursor">Ksau Web</h1>
-          </div>
-          <div className="space-y-2">
-            <p className="text-xl terminal-text">{"{>}"} Your files, our space, until we run out</p>
-            <p className="text-sm text-green-700">{"{>}"} Free storage powered by OneDrive</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          <div className="md:col-span-3">
-            <Card className="border-green-900 bg-black/50 backdrop-blur h-full">
-              <CardHeader>
-                <CardTitle className="text-lg">{"{>}"} Why We Do This</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <p className="text-sm text-green-300">
-                    {"{>}"} Supporting the open-source community by providing hassle-free file sharing for developers.
-                  </p>
-                  <p className="text-sm text-green-300">
-                    {"{>}"} No signups, no complications - just upload and share.
-                  </p>
-                  <p className="text-sm text-green-300">
-                    {"{>}"} Built by developers, for developers.
-                  </p>
+        {/* Main Upload Card */}
+        <Card className="mb-8 slide-in border-border/50 shadow-lg backdrop-blur-sm bg-card/50">
+          <CardContent className="p-8">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Upload Drop Zone */}
+              <div 
+                {...getRootProps()} 
+                className={`drop-zone p-12 text-center transition-all duration-300 rounded-2xl ${
+                  isDragActive ? 'active scale-[1.02]' : ''
+                } ${isUploading ? 'pointer-events-none opacity-50' : 'hover:bg-muted/30 cursor-pointer'}`}
+              >
+                <input {...getInputProps()} disabled={isUploading} />
+                <div className="space-y-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5 blur-2xl rounded-full"></div>
+                    <Upload className={`relative h-14 w-14 mx-auto transition-all duration-300 ${
+                      isDragActive ? 'text-primary scale-110' : 'text-muted-foreground'
+                    }`} />
+                  </div>
+                  <div className="space-y-3">
+                    <h3 className="text-xl font-medium">
+                      {isDragActive
+                        ? "Drop your file here"
+                        : selectedFile 
+                          ? "File ready to upload"
+                          : "Drop a file or click to browse"}
+                    </h3>
+                    {selectedFile && (
+                      <div className="space-y-2">
+                        <p className="text-lg font-medium text-foreground">
+                          {selectedFile.name}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {formatFileSize(selectedFile.size)} • {selectedFile.type || 'Unknown type'}
+                        </p>
+                      </div>
+                    )}
+                    {!selectedFile && (
+                      <p className="text-sm text-muted-foreground">
+                        Maximum file size: 100MB
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <SystemInfo />
-                <div className="pt-4 border-t border-green-900">
-                  <div className="space-y-2">
-                    <p className="text-sm text-green-400">{"{>}"} CLI Command:</p>
-                    <div className="flex justify-between items-start gap-2">
-                      <code className="text-xs text-green-300 font-mono block overflow-x-auto whitespace-pre">
-                        {cliCommand}
-                      </code>
+              </div>
+
+              {/* Advanced Settings */}
+              <div className="space-y-4">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+                >
+                  Advanced Options
+                  <ChevronDown className={`h-4 w-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`} />
+                </Button>
+                
+                {showAdvanced && (
+                  <div className="space-y-6 p-6 bg-muted/30 rounded-xl border border-border/50 slide-in">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Storage Remote</label>
+                        <Select 
+                          name="remote" 
+                          defaultValue={formValues.remote}
+                          onValueChange={(value) => handleFormChange('remote', value)}
+                          disabled={isUploading}
+                        >
+                          <SelectTrigger className="bg-background/50">
+                            <SelectValue placeholder="Select remote" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="hakimionedrive">Hakimi OneDrive</SelectItem>
+                            <SelectItem value="oned">OneDrive</SelectItem>
+                            <SelectItem value="saurajcf">Sauraj CF</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Chunk Size</label>
+                        <Select 
+                          name="chunkSize" 
+                          defaultValue={formValues.chunkSize}
+                          onValueChange={(value) => handleFormChange('chunkSize', value)}
+                          disabled={isUploading}
+                        >
+                          <SelectTrigger className="bg-background/50">
+                            <SelectValue placeholder="Select chunk size" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="2">2MB</SelectItem>
+                            <SelectItem value="4">4MB</SelectItem>
+                            <SelectItem value="8">8MB</SelectItem>
+                            <SelectItem value="16">16MB</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Remote Folder</label>
+                      <Input
+                        type="text"
+                        name="remoteFolder"
+                        value={formValues.remoteFolder}
+                        onChange={(e) => handleFormChange('remoteFolder', e.target.value)}
+                        placeholder="Enter target directory"
+                        disabled={isUploading}
+                        className="bg-background/50"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Custom Filename (Optional)</label>
+                      <Input
+                        type="text"
+                        name="remoteFileName"
+                        value={formValues.remoteFileName}
+                        onChange={(e) => handleFormChange('remoteFileName', e.target.value)}
+                        placeholder="Enter custom filename"
+                        disabled={isUploading}
+                        className="bg-background/50"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Progress Section */}
+              {isUploading && (
+                <div className="space-y-4 p-6 bg-muted/30 rounded-xl border border-border/50 slide-in">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Upload Progress</span>
+                    <span className="text-sm text-muted-foreground">{uploadProgress}%</span>
+                  </div>
+                  <Progress value={uploadProgress} className="h-2" />
+                </div>
+              )}
+
+              {/* Upload Button */}
+              <Button
+                type="submit"
+                disabled={isUploading || !selectedFile}
+                className="w-full h-12 text-lg font-medium rounded-xl"
+                size="lg"
+              >
+                {isUploading ? (
+                  <>
+                    <Upload className="h-5 w-5 mr-2 animate-pulse" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <CloudUpload className="h-5 w-5 mr-2" />
+                    Upload File
+                  </>
+                )}
+              </Button>
+
+              {/* CLI Command Display */}
+              {selectedFile && !isUploading && (
+                <div className="p-4 bg-muted/30 rounded-xl border border-border/50 space-y-3 slide-in">
+                  <p className="text-sm font-medium">Equivalent CLI Command:</p>
+                  <div className="flex items-center gap-2">
+                    <code className="text-xs font-mono bg-background/50 px-3 py-2 rounded-lg flex-1 overflow-x-auto">
+                      {cliCommand}
+                    </code>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={copyCliCommand}
+                      className="flex-shrink-0"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Results Section */}
+        {downloadUrl && (
+          <Card className="mb-8 slide-in border-success/20 bg-success/5">
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-success" />
+                  <h3 className="text-lg font-medium">Upload Complete</h3>
+                </div>
+                <div className="download-box">
+                  <div className="download-box-content flex items-center gap-3">
+                    <Share2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <AnimatedText
+                        text={downloadUrl}
+                        className="text-sm font-mono break-all"
+                        config={{
+                          charDelay: 20,
+                          animDuration: 150
+                        }}
+                      />
+                    </div>
+                    <div className="flex gap-1">
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        onClick={copyCliCommand}
-                        className="hover:bg-green-950 h-6 w-6 flex-shrink-0"
+                        onClick={copyUrl}
+                        className="flex-shrink-0 h-8 w-8"
                       >
                         <Copy className="h-4 w-4" />
                       </Button>
-                    </div>
-                  </div>
-                  <p className="text-xs text-green-700 mt-4">
-                    {"{>}"} This project is open-source! Join us in making file sharing easier for developers.
-                  </p>
-                  <a
-                    href="https://github.com/global-index-source/ksau-go"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-green-500 hover:underline text-xs inline-flex items-center gap-1 mt-2"
-                  >
-                    <Terminal className="h-3 w-3" />
-                    Try our CLI tool
-                  </a>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="md:col-span-6">
-            <Card className="border-green-900 bg-black/50 backdrop-blur">
-              <CardHeader>
-                <CardTitle className="text-2xl flex items-center gap-2">
-                  <FileUp className="h-6 w-6" />
-                  Upload Interface
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div 
-                    {...getRootProps()} 
-                    className={`drop-zone p-10 rounded-lg cursor-pointer ${
-                      isDragActive ? 'active' : ''
-                    } ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
-                  >
-                    <input {...getInputProps()} disabled={isUploading} />
-                    <div className="text-center space-y-2">
-                      <Upload className="h-10 w-10 mx-auto" />
-                      <p className="text-lg">
-                        {isDragActive
-                          ? "{>} Deploying files..."
-                          : selectedFile 
-                            ? `{>} Selected: ${selectedFile.name}`
-                            : "{>} Drag 'n' drop or click to select"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm">
-                      {"{>}"} SELECT_REMOTE
-                    </label>
-                    <Select 
-                      name="remote" 
-                      defaultValue={formValues.remote}
-                      onValueChange={(value) => handleFormChange('remote', value)}
-                      disabled={isUploading}
-                    >
-                      <SelectTrigger className="border-green-900 bg-black text-green-500">
-                        <SelectValue placeholder="Select remote" />
-                      </SelectTrigger>
-                      <SelectContent className="border-green-900 bg-black text-green-500">
-                        <SelectItem value="hakimionedrive">{"{>}"} Hakimi OneDrive</SelectItem>
-                        <SelectItem value="oned">{"{>}"} OneDrive</SelectItem>
-                        <SelectItem value="saurajcf">{"{>}"} Sauraj CF</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm">
-                      {"{>}"} REMOTE_FOLDER
-                    </label>
-                    <Input
-                      type="text"
-                      name="remoteFolder"
-                      value={formValues.remoteFolder}
-                      onChange={(e) => handleFormChange('remoteFolder', e.target.value)}
-                      placeholder="{>} Enter target directory"
-                      className="border-green-900 bg-black text-green-500 placeholder:text-green-800"
-                      disabled={isUploading}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm">
-                      {"{>}"} CUSTOM_FILENAME
-                    </label>
-                    <Input
-                      type="text"
-                      name="remoteFileName"
-                      value={formValues.remoteFileName}
-                      onChange={(e) => handleFormChange('remoteFileName', e.target.value)}
-                      placeholder="{>} Enter custom filename"
-                      className="border-green-900 bg-black text-green-500 placeholder:text-green-800"
-                      disabled={isUploading}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm">
-                      {"{>}"} CHUNK_SIZE
-                    </label>
-                    <Select 
-                      name="chunkSize" 
-                      defaultValue={formValues.chunkSize}
-                      onValueChange={(value) => handleFormChange('chunkSize', value)}
-                      disabled={isUploading}
-                    >
-                      <SelectTrigger className="border-green-900 bg-black text-green-500">
-                        <SelectValue placeholder="Select chunk size" />
-                      </SelectTrigger>
-                      <SelectContent className="border-green-900 bg-black text-green-500">
-                        <SelectItem value="2">{"{>}"} 2MB</SelectItem>
-                        <SelectItem value="4">{"{>}"} 4MB</SelectItem>
-                        <SelectItem value="8">{"{>}"} 8MB</SelectItem>
-                        <SelectItem value="16">{"{>}"} 16MB</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {isUploading && (
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>{"{>}"} Upload progress</span>
-                        <span>{uploadProgress}%</span>
-                      </div>
-                      <Progress 
-                        value={uploadProgress} 
-                        className="h-2 bg-green-950"
-                      />
-                    </div>
-                  )}
-
-                  <div className="space-y-4">
-                    <Button
-                      type="submit"
-                      disabled={isUploading || !selectedFile}
-                      className={`w-full border-green-500 ${
-                        isUploading || !selectedFile 
-                          ? 'bg-green-500/5 text-green-700 cursor-not-allowed'
-                          : 'bg-green-500/10 hover:bg-green-500/20 text-green-500'
-                      }`}
-                    >
-                      {isUploading ? (
-                        <span className="flex items-center gap-2">
-                          <Upload className="h-4 w-4 animate-pulse" /> {"{>}"} Processing upload...
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-2">
-                          <Upload className="h-4 w-4" /> {"{>}"} Execute upload
-                        </span>
-                      )}
-                    </Button>
-
-                    <div className="text-center space-y-2">
-                      <p className="text-sm text-green-700">{"{>}"} Want more power? Try our CLI:</p>
-                      <a 
-                        href="https://github.com/global-index-source/ksau-go"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-green-500 hover:underline text-sm inline-flex items-center gap-1"
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={openUrl}
+                        className="flex-shrink-0 h-8 w-8"
                       >
-                        <Terminal className="h-4 w-4" />
-                        ksau-go on GitHub
-                      </a>
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
-                </form>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-                {downloadUrl && (
-                  <div className="mt-6 space-y-2">
-                    <div className="download-box">
-                      <div className="download-box-content flex items-center gap-2">
-                        <Share2 className="h-4 w-4 text-green-700 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <AnimatedText
-                            text={downloadUrl}
-                            className="text-sm text-green-300 pb-1"
-                            config={{
-                              charDelay: 40,
-                              animDuration: 300
-                            }}
-                          />
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={copyUrl}
-                          className="hover:bg-green-950 flex-shrink-0"
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={openUrl}
-                          className="hover:bg-green-950 flex-shrink-0"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="md:col-span-3">
-            <Card className="border-green-900 bg-black/50 backdrop-blur h-full">
-              <CardHeader>
-                <CardTitle className="text-lg">{"{>}"} Guidelines</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <p className="text-sm text-green-400 font-medium">{"{>}"} Acceptable Files:</p>
-                  <ul className="text-sm text-green-300 space-y-1 list-disc pl-4">
-                    <li>Development builds and test files</li>
-                    <li>Project assets for testing</li>
-                  </ul>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm text-green-400 font-medium">{"{>}"} Storage Policy:</p>
-                  <ul className="text-sm text-green-300 space-y-1 list-disc pl-4">
-                    <li>Files removed at 90% storage capacity</li>
-                    <li>Contact maintainers for file deletion</li>
-                  </ul>
-                </div>
-                <div className="pt-4 border-t border-green-900">
-                  <StorageQuota />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+        {/* Action Bar */}
+        <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-12 action-bar">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSystemModalOpen(true)}
+            className="rounded-full"
+          >
+            <Activity className="h-4 w-4 mr-2" />
+            System Status
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setStorageModalOpen(true)}
+            className="rounded-full"
+          >
+            <Database className="h-4 w-4 mr-2" />
+            Storage
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSettingsModalOpen(true)}
+            className="rounded-full"
+          >
+            <Settings className="h-4 w-4 mr-2" />
+            Info
+          </Button>
         </div>
 
-        <footer className="text-center text-sm space-y-4 text-green-700">
+        {/* Footer */}
+        <footer className="text-center space-y-6 pt-8 border-t border-border/50">
           <div className="flex justify-center gap-6">
             <a
               href="https://github.com/global-index-source/ksau-go"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-green-500 transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors p-2 rounded-full hover:bg-muted/50"
             >
               <Github className="h-5 w-5" />
             </a>
@@ -471,21 +471,21 @@ export default function Home() {
               href="https://x.com/k_sauraj"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-green-500 transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors p-2 rounded-full hover:bg-muted/50"
             >
               <Twitter className="h-5 w-5" />
             </a>
           </div>
-          <div className="space-y-1">
-            <p className="terminal-cursor">{"{>}"} Project Maintainers:</p>
-            <div className="flex justify-center gap-4">
-              <span className="text-green-500">ksauraj</span>
-              <span className="text-green-500">hakimi</span>
-              <span className="text-green-500">pratham</span>
-            </div>
-          </div>
+          <p className="text-sm text-muted-foreground">
+            Made with ❤️ by the open-source community
+          </p>
         </footer>
-      </div>
-    </main>
+      </main>
+
+      {/* Modals */}
+      <SystemModal open={systemModalOpen} onOpenChange={setSystemModalOpen} />
+      <StorageModal open={storageModalOpen} onOpenChange={setStorageModalOpen} />
+      <SettingsModal open={settingsModalOpen} onOpenChange={setSettingsModalOpen} />
+    </div>
   );
 }

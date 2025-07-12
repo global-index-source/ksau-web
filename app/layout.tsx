@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Ksau Web - Free Cloud Storage",
@@ -19,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="font-mono antialiased min-h-screen bg-black text-green-500">
+      <body className={`${inter.className} antialiased min-h-screen bg-background text-foreground`}>
         {children}
         <Toaster />
       </body>
